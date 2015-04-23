@@ -1,0 +1,172 @@
+\documentclass{beamer}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%\usepackage{theorem}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage[ngerman]{babel}
+\usepackage{hyperref}
+\usetheme{Madrid}
+%\usecolortheme{dolphin}
+\usefonttheme{structurebold}
+\setbeamercovered{transparent}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{caption}[numbered]
+%\setbeamertemplate{navigation symbols}{}%remove navigation symbols
+\newcommand{\grad}{^{\circ}}
+\title{Fast Multipole Method für Potentiale in 2D}
+\author{Robert Hemstedt}
+\institute[Universität Bonn -- Bonn]{
+\inst{}{Rheinische Friedrich Wilhelms-Universität Bonn -- Bonn, \newline \newline \tiny{betreut durch Prof. Dr. Schweitzer und Prof. Dr. Klein}}}
+
+\date[27.04.2014]{27. April 2014}
+
+\begin{document}
+\large
+\begin{frame}
+\titlepage
+\vfill
+\begin{center}
+\includegraphics[scale=0.5]{by-sa.png}\\
+\tiny{This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Gliederung}
+\tableofcontents
+\end{frame}
+
+\section{Motivation}
+\begin{frame}
+\frametitle{Motivation}
+\begin{Beispiel}
+
+In der Ebene seien $m$ Punkte $\{x_1,\ldots,x_m\}$ gegeben, die jeweils die Ladungen  $\{q_1,\ldots, q_m\}$ tragen. Zusätzlich seien $n$ Punkte $\{y_1,\ldots,y_n\}$ in der Ebene gegeben, an denen die Potenziale $\Phi(y_i)$ $(i=1,\ldots,n)$ berechnet werden sollen. Der Einfachheit halber gelte $x_i\neq y_j$ für alle $i=1\ldots m, j=1,\ldots,n$.
+\end{Beispiel}
+\begin{alertblock}{Frage}
+In welcher Zeit können alle Potentiale an den ausgewählten Punkten berechnet werden?
+\end{alertblock}
+\end{frame}
+
+\section{Klassischer Ansatz}
+\frame{
+\frametitle{Klassischer Ansatz -- Direktes Ausrechnen}
+\begin{Fakt}
+Potential: $\Phi_{x_i}(y_j) = -q_i\log(||y_j-x_i||)$
+\end{Fakt}
+Also ergeben sich für alle Potentiale an den Punkten $y_j, j=1,\ldots,n$: 
+\begin{equation}\nonumber
+\sum_{i=1}^m {\Phi_{x_i}(y_j)} \qquad \text{für alle }i=1,\ldots,n
+\end{equation}
+Also insgesamt $O(mn)$ Summationen für alle Potentiale. Insbesondere $O(m^2)$, wenn $m=n$.
+}
+
+\section{Fast Multipole Method für Potentiale}
+\frame{
+\frametitle{Fast Multipole Method für Potentiale}
+Die Funktion $\Phi_{x_i}(y_j)$ bezeichnet man in manchen Fällen auch als \emph{Kernel}. Bezeichne: 
+\begin{equation}\nonumber
+G(\mathbf{y},\mathbf{x}) := -\log(||\mathbf{x}-\mathbf{y}||)\text{ und }q(\mathbf{x}_i):=q_i\text{, also }\Phi_{\mathbf{x}_i}{\mathbf{y}_j}=K(\mathbf{y}_j,\mathbf{x}_i)q(\mathbf{x}_i)
+\end{equation}
+Ein Trick der FFM ist es, das Problem in die Komplexe Ebene zu legen. Identifiziere: 
+\begin{align*}
+\mathbf{x}=(\mathbf{x}_1,\mathbf{x}_2) \quad &\Rightarrow \quad z = \mathbf{x}_1 + i\mathbf{x}_2, \\
+\mathbf{y}=(\mathbf{y}_1,\mathbf{y}_2) \quad &\Rightarrow \quad z_0=\mathbf{y}_1 + i \mathbf{y}_2, \\
+G(\mathbf{y},\mathbf{x}) = \Re(G(z_0,z))\text{, mit }& G (z_0,z) = -\log(z_0-z),
+\end{align*}
+wobei wir hier den komplexen (Hauptzweig des) Logarithmus verwenden.
+}
+
+\begin{frame}{Expansion des $G$-Kernels}
+In dieser Notation berechnet man: 
+\begin{equation}\label{potential}
+\sum_{i=1}^m {G(y_j,x_i)q(x_i)} \qquad \text{für alle }i=1,\ldots,n, 
+\end{equation}
+und nimmt den \emph{Realanteil}. Dabei sind die Punkte $(x_i)_{i=1,\ldots,m}$, $(y_j)_{j=1,\ldots,n}$ entsprechend in die Komplexe Ebene eingebettet.\\
+Die Idee der Multipolexpansion ist es nun für einen Expansionspunkt $\mathbf{y}_c$ den Kernel zu schreiben als 
+\begin{equation}
+\nonumber
+G(\mathbf{y},\mathbf{x}) = \sum_i G_i^y(\mathbf{y}_c,\mathbf{y})G_i^x(\mathbf{y}_c,\mathbf{x})
+\end{equation}
+\begin{alertblock}
+
+$G_i^x(\mathbf{y_c},\mathbf{x})$ ist \emph{unabhängig} von $\mathbf{y}$, kann also wiederverwendet werden!
+
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Expansion des $G$-Kernels}
+\begin{alertblock}{Konvention}
+Ab sofort arbeiten wir nur noch in $\mathbb{C}$.
+\end{alertblock}
+\begin{Lemma}
+Es seien der \emph{Quellpunkt} $z_0$, der \emph{Feldpunkt} $z$ und ein \emph{Expansionspunkt} $z_c$ nahe $z$ gegeben, d.h. $|z-z_c| \ll |z_0-z_c|$. Dann gilt: 
+\begin{equation}\label{multiexp}
+G(z_0,z) = \sum_{k=0}^\infty {O_k(z_0-z_c)I_k(z-z_c)}.
+\end{equation}
+Wobei 
+\begin{align*}
+ \nonumber
+I_k(z)&=\frac{z^k}{k!}, k\geq 0 \text{ sowie } \\ 
+O_k(z)&=\frac{(k-1)!}{z^k}, k\geq 1; \text{ und } O_0(z)=-\log(z).
+\end{align*}
+\end{Lemma}
+\end{frame}
+
+\begin{frame}{Expansion des $G$-Kernels}
+\begin{Beweis}
+\[
+G(z_0,z) = -\log(z_0-z) = -\left[\log(z_0-z_c) + \log \left(1-\frac{z-z_c}{z_0-z_c}\right)\right]
+\]
+Taylor-Expansion von \[\log(1-\xi) = -\sum_{k=1}^\infty {\frac{\xi^k}{k} }, |k| < 1\] liefert das gewünschte Ergebnis mit $\xi = \frac{z-z_c}{z_0-z_c}$.
+\end{Beweis}
+\begin{alertblock}{}
+Es ist einer der Schlüsselpunkte der FMM, dass durch Gleichung \eqref{multiexp} im $G$-Kernel $z_0$ und $z$ durch $z_c$ separiert werden.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Multipolexpansion}
+\small
+\begin{Satz}{Multipolexpansion}
+Es seien die Punkte $z_1,\ldots, z_m$ mit Ladungen $q(z_1),\ldots,q(z_m)$ gegeben. Weiterhin seien $z_0$ und $z_c$ derart, dass $|z_i-z_c| \ll |z_0-z_c|$ für alle $i=1,\ldots,m$. Dann gilt:
+\begin{equation}\nonumber
+\sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{i=1}^m \left[\sum_{k=0}^\infty O_k(z_0-z_c)I_k(z_i-z_c)\right] q(z_i);
+\end{equation}
+also die \emph{Multipolexpansion}:
+\begin{equation}\label{multipolexp}
+\sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{k=0}^\infty O_k(z_0-z_c)M_k(z_c),
+\end{equation}
+mit den \emph{Momenten}:
+\begin{equation}\label{moments}
+M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i).
+\end{equation}
+\end{Satz}
+\end{frame}
+
+\begin{frame}{Momente}
+\begin{block}{Der Überlegung wert}
+Die Momente \[ M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i) \] sind nur von den gegebenen Ladungen $x_1,\ldots,x_m$ und dem Expansionspunkt $z_c$ abhängig und brauchen nicht nochmal berechnet werden, wenn $z_0$ seine Lage ändert!
+Später werden die $z_c$ Zentren von Zellen eines Gitters sein, sodass die Momente $M_k(z_c)$ häufig wiederverwendet werden können. Dies ist ein \emph{Schlüsselfaktor}, warum die FMM so schnell ist!
+\end{block}
+
+\end{frame}
+\begin{frame}{Fehler der Multipolexpansion}
+In \eqref{multipolexp} tritt eine \emph{unendliche} Summe auf. Fehler in der Fast Multipole Method können durch die Anzahl der ausgewerteten Terme in \eqref{multipolexp} kontrolliert werden.
+
+\end{frame}
+
+\subsection{FFM-Algorithmus}
+\frame{
+\frametitle{FFM-Algorithmus}
+}
+
+\section{Vorteile der FFM}
+\frame{
+\frametitle{Vorteile der FFM}
+}
+
+
+\end{document}
