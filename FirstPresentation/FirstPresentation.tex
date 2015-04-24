@@ -20,15 +20,16 @@
 \setbeamertemplate{footline}[frame number]
 \setbeamertemplate{caption}[numbered]
 \setbeamertemplate{navigation symbols}{}%remove navigation symbols
+\setbeamertemplate{bibliography item}[text] % enumerated bibliography
 \newcommand{\grad}{^{\circ}}
 \title{Fast Multipole Method für Potentiale in 2D}
 \author{Robert Hemstedt}
 \institute[Universität Bonn -- Bonn]{
 \inst{}{Rheinische Friedrich Wilhelms-Universität Bonn -- Bonn, \newline \newline \tiny{betreut durch die Herren Prof. Dr. Schweitzer und Prof. Dr. Klein}}}
-
 \date[27.04.2014]{27. April 2014}
 
 \begin{document}
+
 \large
 \begin{frame}
 \titlepage
@@ -402,12 +403,34 @@ Dann berechnen wir
 wobei wir für die $z_i$, die sich in $C$ oder einen seiner acht Nachbarzellen befinden, die \emph{Nahwirkung} mit \emph{direkter} Summation auswerten. Hingegen verwenden wir für die Fernwirkung, also Beiträge aus der Interaktionsliste von $C$ und fernen Zellen, die Lokalexpansion der Zelle $C$, also \eqref{localexp}, wobei $z_L$ das Zentrum von $C$ ist.
 \end{frame}
 
-%\section{Vorteile der FMM}
-%\frame{
-%\frametitle{Vorteile der FMM}
-%}
+\begin{frame}{Laufzeitanalyse}
+Zurück zur am Anfang gestellten Frage. Sind wir mit dem FMM-Algorithmus wirklich schneller?
+\begin{Satz}[Laufzeit des FMM-Algorithmus]
+Sei $N$ die Anzahl der geladenen Teilchen und $N$ die Anzahl der Punkte deren Potentiale, verursacht durch die geladenen Teilchen, berechnet werden sollen. Sei $p$ die Anzahl der Terme die für die Multipol- und Lokalexpansionen verwendet werden und $maxl$ die maximale Anzahl von geladenen Teilchen in einem Blatt des Quad-Trees. Dann ist die Berechnung aller Potentiale mit dem hier vorgestellten Fast-Multipole-Method-Algorithmus in Laufzeit $\mathcal{O}(N)$ möglich.
+\end{Satz}
+\end{frame}
 
+\begin{frame}{Laufzeitanalyse}
+\begin{Beweis}
+\footnotesize
+\begin{itemize}
+\item $N_\text{B}$ = Anzahl der Blätter im Quad-Tree $\approx N/maxl = \mathcal{O}(N)$
+\item $N_\text{Z}$ = Anzahl der Zellen im Quad-Tree $\approx N_\text{B}\cdot(1+\frac{1}{4} + \frac{1}{4^2} + \ldots) \leq N_\text{B} \cdot \frac{4}{3} = \mathcal{O}(N)$
+\item Anzahl benachbarter Zellen = 9; Anzahl der Zellen in der Interaktionsliste = 27 (2D)
+\item Anzahl Operationen, um Multipolmomente zu berechnen = $p\cdot maxl \cdot N_\text{B} = \mathcal{O}(N)$
+\item Anzahl Operationen im Upward pass = $N_\text{Z}\cdot 4 \cdot p^2 = \mathcal{O}(N)$
+\item Anzahl Operationen im Downward pass = $N_\text{Z}\cdot \left[p^2 (L2L) + 27 \cdot p^2(M2L) \right] = \mathcal{O}(N)$
+\item Anzahl Operationen der Lokalexpansionen = $N \cdot p = \mathcal{O}(N)$
+\item Anzahl Operationen der direkten Berechnungen der Potentiale der Nahwirkung = $N\cdot 9\cdot maxl = \mathcal{O}(N)$
+\end{itemize}
+Alle Abschätzungen haben höchstens Laufzeit $\mathcal{O}(N)$, damit ist die Gesamtlaufzeit $\mathcal{O}(N)$.
+\end{Beweis}
+\end{frame}
 
-
+\begin{frame}{Literaturverzeichnis}
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{sources}
+\end{frame}
 
 \end{document}
