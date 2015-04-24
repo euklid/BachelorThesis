@@ -49,7 +49,7 @@
 \begin{frame}
 \frametitle{Motivation}
 \begin{Beispiel}
-In der Ebene seien $m$ Punkte $\{x_1,\ldots,x_m\}$ gegeben, die jeweils die Ladungen  $\{q_1,\ldots, q_m\}$ tragen. Zusätzlich seien $n$ Punkte $\{y_1,\ldots,y_n\}$ in der Ebene gegeben, an denen die Potenziale $\Phi(y_i)$ $(i=1,\ldots,n)$ berechnet werden sollen. Der Einfachheit halber gelte $x_i\neq y_j$ für alle $i=1\ldots m, j=1,\ldots,n$.
+In der Ebene seien $m$ paarweise verschiedene Punkte $\{x_1,\ldots,x_m\}$ gegeben, die jeweils die Ladungen  $\{q_1,\ldots, q_m\}$ tragen. Zusätzlich seien $n$ paarweise verschiedene Punkte $\{y_1,\ldots,y_n\}$ in der Ebene gegeben, an denen die Potentiale $\Phi(y_i)$ $(i=1,\ldots,n)$ berechnet werden sollen. Der Einfachheit halber gelte $x_i\neq y_j$ für alle $i=1\ldots m, j=1,\ldots,n$.
 \end{Beispiel}
 \begin{alertblock}{Frage}
 In welcher Zeit können alle Potentiale an den ausgewählten Punkten berechnet werden?
@@ -60,11 +60,11 @@ In welcher Zeit können alle Potentiale an den ausgewählten Punkten berechnet w
 \frame{
 \frametitle{Klassischer Ansatz -- Direktes Ausrechnen}
 \begin{Fakt}
-Potential: $\Phi_{x_i}(y_j) = -q_i\log(||y_j-x_i||)$
+Potential: $\Phi_{x_i}(y_j) = -q_i\log(||y_j-x_i||)$\cite{FastParticle}
 \end{Fakt}
 Also ergeben sich für alle Potentiale an den Punkten $y_j, j=1,\ldots,n$: 
 \begin{equation}\nonumber
-\sum_{i=1}^m {\Phi_{x_i}(y_j)} \qquad \text{für alle }i=1,\ldots,n
+\sum_{i=1}^m {\Phi_{x_i}(y_j)} \qquad \text{für alle }j=1,\ldots,n
 \end{equation}
 Also insgesamt $O(mn)$ Summationen für alle Potentiale. Insbesondere $O(m^2)$, wenn $m=n$.
 }
@@ -72,7 +72,7 @@ Also insgesamt $O(mn)$ Summationen für alle Potentiale. Insbesondere $O(m^2)$, 
 \section{Fast Multipole Method für Potentiale}
 \frame{
 \frametitle{$G$-Kernel}
-Die Funktion $\Phi_{x_i}(y_j)$ bezeichnet man in manchen Fällen auch als \emph{Kernel}. Bezeichne: 
+Die Funktion $\Phi_{x_i}(y_j)$ bezeichnet man in manchen Fällen auch als \emph{Kernel}\cite{FMBEM}. Bezeichne: 
 \begin{equation}\nonumber
 G(\mathbf{y},\mathbf{x}) := -\log(||\mathbf{x}-\mathbf{y}||)\text{ und }q(\mathbf{x}_i):=q_i\text{, also }\Phi_{\mathbf{x}_i}(\mathbf{y}_j)=G(\mathbf{y}_j,\mathbf{x}_i)q(\mathbf{x}_i)
 \end{equation}
@@ -87,18 +87,18 @@ wobei wir hier den komplexen (Hauptzweig des) Logarithmus verwenden.
 
 \begin{frame}{Expansion des $G$-Kernels}
 In dieser Notation berechnet man: 
-\begin{equation}\label{potential}
+\begin{equation*}\label{potential}
 \sum_{i=1}^m {G(y_j,x_i)q(x_i)} \qquad \text{für alle }i=1,\ldots,n, 
-\end{equation}
+\end{equation*}
 und nimmt den \emph{Realanteil}. Dabei sind die Punkte $(x_i)_{i=1,\ldots,m}$, $(y_j)_{j=1,\ldots,n}$ entsprechend in die Komplexe Ebene eingebettet.\\
-Die Idee der Multipolexpansion ist es nun für einen Expansionspunkt $\mathbf{y}_c$ den Kernel zu schreiben als 
+Die Idee der Multipolexpansion ist es nun für einen Expansionspunkt $y_c$ den Kernel zu schreiben als 
 \begin{equation}
 \nonumber
-G(\mathbf{y},\mathbf{x}) = \sum_i G_i^y(\mathbf{y}_c,\mathbf{y})G_i^x(\mathbf{y}_c,\mathbf{x})
+G(y,x) = \sum_i G_i^y(y_c,y)G_i^x(y_c,x)
 \end{equation}
 \begin{alertblock}
 
-$G_i^x(\mathbf{y_c},\mathbf{x})$ ist \emph{unabhängig} von $\mathbf{y}$, kann also wiederverwendet werden!
+$G_i^x(y_c,x)$ ist \emph{unabhängig} von $y$, kann also wiederverwendet werden!
 
 \end{alertblock}
 \end{frame}
@@ -154,7 +154,7 @@ M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i).
 
 \begin{frame}{Momente}
 \begin{block}{Der Überlegung wert}
-Die Momente \[ M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i) \] sind nur von den gegebenen Ladungen $x_1,\ldots,x_m$ und dem Expansionspunkt $z_c$ abhängig und brauchen nicht nochmal berechnet werden, wenn $z_0$ seine Lage ändert!
+Die Momente \[ M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i) \] sind nur von den gegebenen Ladungspunkten $z_1,\ldots,z_m$ und dem Expansionspunkt $z_c$ abhängig und brauchen nicht nochmal berechnet werden, wenn $z_0$ seine Lage ändert!
 Später werden die $z_c$ Zentren von Zellen eines Gitters sein, sodass die Momente $M_k(z_c)$ häufig wiederverwendet werden können. Dies ist ein \emph{Schlüsselfaktor}, warum die FMM so schnell ist!
 \end{block}
 
@@ -167,7 +167,7 @@ Für den Fehler $E_M^p$ der Multipolexpansion gilt:
 E^p_M&:= \left|\sum_{i=1}^m {G(z_0,z_i)q(z_i)} - \sum_{k=0}^p O_k(z_0-z_c)M_k(z_c)\right| \\
 &\leq \frac{A}{1-\frac{R}{|z_0-z_c|}}\frac{R^{p+1}}{|z_0-z_c|^{p+1}}, 
 \end{align*}
-wobei $R$ der Radius eines Kreises um $z_c$ mit $|z_i-z_c| < R < |z_0-z_c|$ für alle $i=1,\ldots,n$ und $A=\sum_{i=1}^m |q_i|$.
+wobei $R$ der Radius eines Kreises um $z_c$ mit $|z_i-z_c| < R < |z_0-z_c|$ für alle $i=1,\ldots,m$ und $A=\sum_{i=1}^m |q_i|$.
 \end{Satz}
 \end{frame}
 
@@ -186,24 +186,24 @@ E^p_M&:= \left|\sum_{k=p+1}^\infty O_k(z_0-z_c)M_k(z_c)\right| \leq \sum_{k=p+1}
 
 \begin{frame}{Fehler der Multipolexpansion}
 Sei $\rho = \frac{|z_0-z_c|}{R}$. Dann lässt sich $E^p_M$ abschätzen als 
-\begin{equation}\label{rhomultipolerror}
+\begin{equation*}\label{rhomultipolerror}
 E^p_M \leq \frac{A}{\rho-1}\left(\frac{1}{\rho}\right)^p
-\end{equation}
+\end{equation*}
 \begin{block}{Bemerkung}
 Je größer $\rho$, desto kleiner ist die Fehlerschranke. Beobachte, dass für den Fall $\rho \geq 2 \Leftrightarrow |z_0-z_c| \geq 2 R$:
-\begin{equation}\label{halfmultipolerror}
-E^p_M \leq A\left(\frac{1}{2}\right)^p
-\end{equation}
+\begin{equation*}\label{halfmultipolerror}
+E^p_M \leq A\left(\frac{1}{2}\right)^p.
+\end{equation*}
 Damit kann man für eine vorher festgelegte Genauigkeit $\varepsilon$ die Anzahl $p$ der zu evaluierenden Momente bestimmen.
 \end{block}
 \end{frame}
 
 \begin{frame}{Translationsoperatoren}
-Während des Algorithmus werden mehrere Expansionspunkte benötigt. Anstatt alle Momente für einen neuen Expansionspunkt $z_c'$ wieder neu zu berechnen, kann man die alten Momente von $z_c$ \glqq verschieben\grqq.
+Während des Algorithmus werden mehrere Expansionspunkte benötigt. Anstatt alle Momente für einen neuen Expansionspunkt $z_{c'}$ wieder neu zu berechnen, kann man die alten Momente von $z_c$ \glqq verschieben\grqq.
 \begin{Satz}[Moment-to-Moment-Translation, M2M]
-Es seien die Punkte $z_1,\ldots, z_m$ mit Ladungen $q(z_1),\ldots,q(z_m)$ gegeben. Weiterhin seien $z_0$, $z_c$ und $z_c'$ derart, dass $|z_i-z_c| \ll |z_0-z_c|$ und $|z_i-z_c'| \ll |z_0-z_c'|$  und für alle $i=1,\ldots,m$. Dann gilt
+Es seien die Punkte $z_1,\ldots, z_m$ mit Ladungen $q(z_1),\ldots,q(z_m)$ gegeben. Weiterhin seien $z_0$, $z_c$ und $z_{c'}$ derart, dass $|z_i-z_c| \ll |z_0-z_c|$ und $|z_i-z_{c'}| \ll |z_0-z_{c'}|$ für alle $i=1,\ldots,m$. Dann gilt
 \begin{equation}\label{M2Meq}
-M_k(z_c') = \sum_{l=0}^k I_{k-l}(z_c-z_c')M_l(z_c).
+M_k(z_{c'}) = \sum_{l=0}^k I_{k-l}(z_c-z_{c'})M_l(z_c).
 \end{equation}
 \end{Satz}
 \end{frame}
@@ -212,10 +212,10 @@ M_k(z_c') = \sum_{l=0}^k I_{k-l}(z_c-z_c')M_l(z_c).
 \footnotesize
 \begin{Beweis}
 \begin{align*}
-M_k(z_c') &= \sum_{i=0}^m I_k(z-z_c')q(z_i) \\
-&=  \sum_{i=0}^m I_k\left[(z-z_c) + (z_c-z_c')\right]q(z_i) \\
-&= \sum_{i=0}^m \sum_{l=0}^k I_l(z-z_c)I_{k-l}(z_c-z_c') q(z_i)\\
-&= \sum_{l=0}^k I_{k-l}(z_c-z_c')M_l(z_c)
+M_k(z_{c'}) &= \sum_{i=0}^m I_k(z-z_{c'})q(z_i) \\
+&=  \sum_{i=0}^m I_k\left[(z-z_c) + (z_c-z_{c'})\right]q(z_i) \\
+&= \sum_{i=0}^m \sum_{l=0}^k I_l(z-z_c)I_{k-l}(z_c-z_{c'}) q(z_i)\\
+&= \sum_{l=0}^k I_{k-l}(z_c-z_{c'})M_l(z_c)
 \end{align*}
 Dabei haben wir die Binomische Formel in der dritten Gleichung verwendet.
 \end{Beweis}
@@ -225,7 +225,7 @@ Durch die endliche Zahl der Summanden wird keine weitere Fehlerquelle eingeführ
 \end{frame}
 
 \begin{frame}{Lokale Expansion}
-Statt des Expansionspunkt $z_c$ verschieben wir jetzt den Quellpunkt $z_0$:
+Statt des Expansionspunktes $z_c$ verschieben wir jetzt den Quellpunkt $z_0$:
 \begin{Satz}[Lokale Expansion und Moment-to-Local-Translation]
 Mit den Bedingungen der Multipolexpansion sei ein weiterer Punkt $z_L$ nahe $z_0$, d.h. $|z_0-z_L|\ll |z_L-z_c|$ gegeben. Dann gilt die folgende \emph{lokale Expansion}
 \begin{equation}\label{localexp}
@@ -243,7 +243,7 @@ L_l(z_L)=(-1)^l\sum_{k=0}^\infty O_{l+k}(z_L-z_c)M_k(z_c).
 Sind die lokalen Expansionskoeffizienten $L_l(z_L)$ einmal berechnet worden, ist die Gleichung \eqref{localexp} 
 \[\sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{l=0}^\infty L_l(z_L)I_l(z_0-z_L)
 \]
-unabhängig von $z_c$. Wie bei der Moment-to-Moment-Translation lässt sich auch eine Local-to-Local-Expansion ausdrücken. Ein weiterer Fall, wo bereits berechnete Terme wiederverwendet werden können.
+unabhängig von $z_c$. Wie bei der Moment-to-Moment-Translation lässt sich auch eine Local-to-Local-Translation ausdrücken. Ein weiterer Fall, wo bereits berechnete Terme wiederverwendet werden können.
 
 Die $z_L$ werden auch wie die $z_c$ später im Algorithmus Gitterpunkte darstellen.
 \end{block}
@@ -263,7 +263,7 @@ für alle $p\geq \max\{2, \frac{2\rho}{\rho-1}\}$, wobei $e$ die Eulersche Zahl 
 
 \begin{frame}{Local-to-Local-Translation}
 \normalsize
-Ähnlich der Moment-to-Local-Translation führen wir die Local-to-Local-Translation ein:
+Ähnlich der Moment-to-Moment-Translation führen wir die Local-to-Local-Translation ein:
 \begin{Satz}[Local-to-Local-Translation, L2L]
 Es sei $z_{L'}$ ein Punkt nahe $z_L$, d.h. $|z_0-z_{L'}|\ll |z_0-z_c|$. Dann gilt für eine lokale Expansion mit $p$ Termen:
 \begin{align}
@@ -300,7 +300,7 @@ Uns stehen nun folgende Werkzeuge zur Verfügung:
 \end{align*}
 \end{frame}
 
-\subsection{FMM-Algorithmus}
+\section{FMM-Algorithmus}
 \begin{frame}{FMM-Algorithmus}
 Der Fast Multipole-Algorithmus gliedert sich in mehrere Schritte:
 \begin{enumerate}
@@ -315,7 +315,7 @@ Der Fast Multipole-Algorithmus gliedert sich in mehrere Schritte:
 \begin{enumerate}
 \item Lege alle Punkte in ein Quadrat. Dies bildet eine \emph{Level} 0 \emph{Zelle}.
 \item Zerlege das Quadrat in Level 0 in vier Zellen (Quadrate) von Level 1.
-\item Lege eine Zahl $maxl$, wie viele Punkte sich maximal innerhalb einer Zelle des Quad-Trees befinden dürfen.
+\item Lege eine Zahl $maxl$, wie viele Punkte sich maximal innerhalb einer Zelle des Quad-Trees befinden dürfen, fest.
 \item Für eine Zelle von Level $l$ mache folgendes:\\
 Wenn sie mehr als $maxl$ Punkte enthält, zerlege sie in vier \emph{Tochterzellen} von Level $l+1$. Sie ist jetzt eine \emph{Vaterzelle}.\\
 Sonst bildet sie ein \emph{Blatt} des Quad-Trees und wird nicht weiter zerlegt.
@@ -334,7 +334,7 @@ Sonst bildet sie ein \emph{Blatt} des Quad-Trees und wird nicht weiter zerlegt.
 Berechnung aller Momente aller Zellenzentren von Level $\geq 2$ mit $p$ Termen, beginnend bei den Blättern:
 \begin{itemize}
 \item Handelt es sich bei der Zelle um ein Blatt, berechne das Moment der Zelle mittels der Gleichung \eqref{moments} für alle geladenen Punkte innerhalb des Blattes, dabei ist $z_c$ das Zentrum der Zelle.
-\item Handelt es sich um eine Vaterzelle, berechne ihr Moment mittels der Summation der M2M-Translation \eqref{M2Meq} der Zentren ihrer Tochterzellen, dabei ist $z_c'$ das Zentrum der Vaterzelle und $z_c$ das Zentrum einer Tochterzelle.
+\item Handelt es sich um eine Vaterzelle, berechne ihr Moment mittels der Summation der M2M-Translationen \eqref{M2Meq} der Zentren ihrer Tochterzellen, dabei ist $z_{c'}$ das Zentrum der Vaterzelle und $z_c$ das Zentrum einer Tochterzelle.
 \end{itemize}
 \end{frame}
 
@@ -393,7 +393,7 @@ Berechnung aller lokalen Expansionskoeffizienten aller Zellen startend bei Level
 \end{frame}
 
 \begin{frame}{Berechnung der Potentiale}
-Für die Punkte an denen das Potential berechnet werden soll, erfolgt nun jene Berechnung.\\
+Für die Punkte an denen das Potential berechnet werden soll, erfolgt nun die Berechnung dessen.\\
 Sei $z_0$ in Blatt $C$.
 Dann berechnen wir 
 \begin{align*}
