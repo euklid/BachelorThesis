@@ -48,7 +48,6 @@
 \begin{frame}
 \frametitle{Motivation}
 \begin{Beispiel}
-
 In der Ebene seien $m$ Punkte $\{x_1,\ldots,x_m\}$ gegeben, die jeweils die Ladungen  $\{q_1,\ldots, q_m\}$ tragen. Zusätzlich seien $n$ Punkte $\{y_1,\ldots,y_n\}$ in der Ebene gegeben, an denen die Potenziale $\Phi(y_i)$ $(i=1,\ldots,n)$ berechnet werden sollen. Der Einfachheit halber gelte $x_i\neq y_j$ für alle $i=1\ldots m, j=1,\ldots,n$.
 \end{Beispiel}
 \begin{alertblock}{Frage}
@@ -74,7 +73,7 @@ Also insgesamt $O(mn)$ Summationen für alle Potentiale. Insbesondere $O(m^2)$, 
 \frametitle{$G$-Kernel}
 Die Funktion $\Phi_{x_i}(y_j)$ bezeichnet man in manchen Fällen auch als \emph{Kernel}. Bezeichne: 
 \begin{equation}\nonumber
-G(\mathbf{y},\mathbf{x}) := -\log(||\mathbf{x}-\mathbf{y}||)\text{ und }q(\mathbf{x}_i):=q_i\text{, also }\Phi_{\mathbf{x}_i}{\mathbf{y}_j}=K(\mathbf{y}_j,\mathbf{x}_i)q(\mathbf{x}_i)
+G(\mathbf{y},\mathbf{x}) := -\log(||\mathbf{x}-\mathbf{y}||)\text{ und }q(\mathbf{x}_i):=q_i\text{, also }\Phi_{\mathbf{x}_i}(\mathbf{y}_j)=G(\mathbf{y}_j,\mathbf{x}_i)q(\mathbf{x}_i)
 \end{equation}
 Ein Trick der FMM ist es, das Problem in die Komplexe Ebene zu legen. Identifiziere: 
 \begin{align*}
@@ -127,7 +126,7 @@ O_k(z)&=\frac{(k-1)!}{z^k}, k\geq 1; \text{ und } O_0(z)=-\log(z).
 \[
 G(z_0,z) = -\log(z_0-z) = -\left[\log(z_0-z_c) + \log \left(1-\frac{z-z_c}{z_0-z_c}\right)\right]
 \]
-Taylor-Expansion von \[\log(1-\xi) = -\sum_{k=1}^\infty {\frac{\xi^k}{k} }, |k| < 1\] liefert das gewünschte Ergebnis mit $\xi = \frac{z-z_c}{z_0-z_c}$.
+Taylor-Expansion von \[\log(1-\xi) = -\sum_{k=1}^\infty {\frac{\xi^k}{k} }, |\xi| < 1\] liefert das gewünschte Ergebnis mit $\xi = \frac{z-z_c}{z_0-z_c}$.
 \end{Beweis}
 \begin{alertblock}{}
 Es ist einer der Schlüsselpunkte der FMM, dass durch Gleichung \eqref{multiexp} im $G$-Kernel $z_0$ und $z$ durch $z_c$ separiert werden.
@@ -225,9 +224,9 @@ Durch die endliche Zahl der Summanden wird keine weitere Fehlerquelle eingeführ
 \end{frame}
 
 \begin{frame}{Lokale Expansion}
-Statt des Expansionspunkt $z_c$ verschieben wir jetzt den Quellpunkt $x_0$:
+Statt des Expansionspunkt $z_c$ verschieben wir jetzt den Quellpunkt $z_0$:
 \begin{Satz}[Lokale Expansion und Moment-to-Local-Translation]
-Mit den Bedingungen der Multipolexpansion sei ein weiterer Punkt $z_L$ nahe $z_0$, d.h. $|z_0-z_L|\ll |z_l-z_c|$ gegeben. Dann gilt die folgende \emph{lokale Expansion}
+Mit den Bedingungen der Multipolexpansion sei ein weiterer Punkt $z_L$ nahe $z_0$, d.h. $|z_0-z_L|\ll |z_L-z_c|$ gegeben. Dann gilt die folgende \emph{lokale Expansion}
 \begin{equation}\label{localexp}
 \sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{l=0}^\infty L_l(z_L)I_l(z_0-z_L),
 \end{equation}
@@ -300,15 +299,115 @@ Uns stehen nun folgende Werkzeuge zur Verfügung:
 \end{align*}
 \end{frame}
 
-%\subsection{FMM-Algorithmus}
-%\frame{
-%\frametitle{FMM-Algorithmus}
-%}
+\subsection{FMM-Algorithmus}
+\begin{frame}{FMM-Algorithmus}
+Der Fast Multipole-Algorithmus gliedert sich in mehrere Schritte:
+\begin{enumerate}
+\item Erstellen einer Quad-Tree-Struktur.
+\item \emph{Upward pass}.
+\item \emph{Downward pass}.
+\item Berechnung der Potentiale.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Erstellen der Quad-Tree-Struktur}
+\begin{enumerate}
+\item Lege alle Punkte in ein Quadrat. Dies bildet eine \emph{Level} 0 \emph{Zelle}.
+\item Zerlege das Quadrat in Level 0 in vier Zellen (Quadrate) von Level 1.
+\item Lege eine Zahl $maxl$, wie viele Punkte sich maximal innerhalb einer Zelle des Quad-Trees befinden dürfen.
+\item Für eine Zelle von Level $l$ mache folgendes:\\
+Wenn sie mehr als $maxl$ Punkte enthält, zerlege sie in vier \emph{Tochterzellen} von Level $l+1$. Sie ist jetzt eine \emph{Vaterzelle}.\\
+Sonst bildet sie ein \emph{Blatt} des Quad-Trees und wird nicht weiter zerlegt.
+\item Fahre mit obigem Schritt fort, bis keine Zelle mehr in Quadrate zerlegt wird.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Erstellen der Quad-Tree-Struktur}
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{quadtree.png}
+\caption{Quad-Tree der geladenen Punkte (rot), eines Quellpunktes (grün) und Blätter (grau)}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Upward pass}
+Berechnung aller Momente aller Zellenzentren von Level $\geq 2$ mit $p$ Termen, beginnend bei den Blättern:
+\begin{itemize}
+\item Handelt es sich bei der Zelle um ein Blatt, berechne das Moment der Zelle mittels der Gleichung \eqref{moments} für alle geladenen Punkte innerhalb des Blattes, dabei ist $z_c$ das Zentrum der Zelle.
+\item Handelt es sich um eine Vaterzelle, berechne ihr Moment mittels der Summation der M2M-Translation \eqref{M2Meq} der Zentren ihrer Tochterzellen, dabei ist $z_c'$ das Zentrum der Vaterzelle und $z_c$ das Zentrum einer Tochterzelle.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Upward pass}
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{upward.png}
+\caption{Beispielhafter Upward pass von einer Blattzelle. \linebreak violett: Zentren von Vaterzellen, gelb: Zentren von Blättern,\linebreak $\rightarrow$: Moment direkt berechnet, $\dashrightarrow$: M2M-Translation}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Downward pass}
+Hierfür benötigen wir noch etwas mehr Vokabular:
+\begin{Definition}
+\begin{itemize}
+\item Zwei Zellen heißen \emph{benachbart in Level $l$}, wenn sie mindestens eine gemeinsame Ecke haben.
+\item Zwei Zellen heißen \emph{gut separiert in Level $l$}, wenn sie auf Level $l$ \emph{nicht benachbart sind}, aber ihre \emph{Vaterzellen in Level $l-1$ benachbart} sind.
+\item Bezeichne die Menge aller gut separierten Zellen einer Zelle $C$ in Level $l$ als \emph{Interaktionsliste} von $C$.
+\item Eine Zelle ist eine \emph{Fernzelle} von $C$, wenn ihre jeweiligen Vaterzellen nicht benachbart sind. Dabei sind die größtmöglichen Vaterzellen die von Level $2$.
+\end{itemize}
+\end{Definition}
+\end{frame}
+
+\begin{frame}{Downward pass}
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{intlist.png}
+\caption{schwarz: Zelle $C$, gepunktet: ihre benachbarten Zellen, \linebreak gewellt: ihre Interaktionsliste, weiß: Fernzellen von $C$}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Downward pass}
+Berechnung aller lokalen Expansionskoeffizienten aller Zellen startend bei Level $2$ und die Baumstruktur nach unten zu allen Blättern folgend.\\
+\begin{enumerate}
+\item\label{locexpsum} Der lokale Expansionskoeffizient einer Zelle $C$ ist die Summe 
+\begin{enumerate} 
+\item\label{intlist} der Beiträge der Zellen von der Interaktionsliste von $C$ und 
+\item\label{farcell} von allen Fernzellen.
+\end{enumerate}
+\item \ref{locexpsum}.\ref{intlist} benutzt M2L-Translation \eqref{M2L}, wobei die Momente die der Zellen der Interaktionsliste sind.
+\item \ref{locexpsum}.\ref{farcell} benutzt L2L-Translation \eqref{L2Leq} um den lokalen Expansionspunkt vom Zentrum der Vaterzelle von $C$ zum Zentrum von $C$ zu verschieben.
+\item Auf Level 2 wird für den lokalen Expansionskoeffizienten M2L-Translation verwendet. Dabei werden die Beiträge der in Level 2 nicht benachbarten Zellen aufsummiert. 
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Downward pass}
+\begin{figure}
+\includegraphics[height=0.5\textwidth]{downpass1.png}
+\caption{Downward Pass bei Level 2. $\dashrightarrow$: M2L-Translation}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Downward pass}
+\begin{figure}
+\includegraphics[height=0.5\textwidth]{downpass2.png}
+\caption{Downward Pass bei Leveln 3 und 4. $\dashrightarrow$: M2L-Translation, $\rightarrow$: L2L-Translation, Kreis: Zellzentrum Level 2, Quadrat: Zellzentrum Level 3, Dreieck: Zellzentrum Level 4}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Berechnung der Potentiale}
+Für die Punkte an denen das Potential berechnet werden soll, erfolgt nun jene Berechnung.\\
+Sei $z_0$ in Blatt $C$.
+Dann berechnen wir 
+\begin{align*}
+\Phi(z_0) &= \Phi_{\text{nah}}(z_0) + \Phi_{\text{fern}}(z_0) &\\
+\sum_{i=1}^m {G(z_0,z_i)q(z_i)} &= \underbrace{\sum_{z_i\text{ nahe } z_0 } G(z_0,z_i)q(z_i)}_{\text{Nahwirkung}} + \underbrace{\sum_{z_i\text{ fern }z_0} G(z_0,z_i)q(z_i)}_\text{Fernwirkung},
+\end{align*}
+wobei wir für die $z_i$, die sich in $C$ oder einen seiner acht Nachbarzellen befinden, die \emph{Nahwirkung} mit \emph{direkter} Summation auswerten. Hingegen verwenden wir für die Fernwirkung, also Beiträge aus der Interaktionsliste von $C$ und fernen Zellen, die Lokalexpansion der Zelle $C$, also \eqref{localexp}, wobei $z_L$ das Zentrum von $C$ ist.
+\end{frame}
 
 %\section{Vorteile der FMM}
 %\frame{
 %\frametitle{Vorteile der FMM}
 %}
+
+
 
 
 \end{document}
