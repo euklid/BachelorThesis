@@ -1,3 +1,8 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% (C) 2015, by Robert Hemstedt <CC-BY-SA 3.0>                                                        %
+% This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.        %
+% To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[ngerman]{beamer}
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath}
@@ -30,7 +35,7 @@
 \vfill
 \begin{center}
 \includegraphics[scale=0.5]{by-sa.png}\\
-\tiny{This work is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.}
+\tiny{This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.}
 \end{center}
 \end{frame}
 
@@ -282,15 +287,28 @@ Wie bereits bei der M2M-Translation \eqref{M2Meq} werden bei der L2L-Translation
 \end{Beweis}
 \end{frame}
 
-\subsection{FMM-Algorithmus}
-\frame{
-\frametitle{FMM-Algorithmus}
-}
+\begin{frame}{Zwischenzusammenfassung}
+Uns stehen nun folgende Werkzeuge zur Verfügung:
+\small
+\begin{align*}
+\text{Momente: }& M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i)\\
+\text{Multipolexpansion: }&\sum_{i=1}^m {G(z_0,z_i)q(z_i)} \approx \sum_{k=0}^p O_k(z_0-z_c)M_k(z_c)\\
+\text{M2M-Translation: }& M_k(z_c') = \sum_{l=0}^k I_{k-l}(z_c-z_c')M_l(z_c)\\
+\text{M2L-Translation: }&L_l(z_L)\approx(-1)^l\sum_{k=0}^p O_{l+k}(z_L-z_c)M_k(z_c) \\
+\text{Lokale Expansion: }&\sum_{i=1}^m {G(z_0,z_i)q(z_i)} \approx \sum_{l=0}^p L_l(z_L)I_l(z_0-z_L)\\
+\text{L2L-Translation: }&L_l(z_{L'})=\sum_{s=0}^{p-l} I_s(z_{L'}-z_L)L_{l+s}(z_L)
+\end{align*}
+\end{frame}
 
-\section{Vorteile der FMM}
-\frame{
-\frametitle{Vorteile der FMM}
-}
+%\subsection{FMM-Algorithmus}
+%\frame{
+%\frametitle{FMM-Algorithmus}
+%}
+
+%\section{Vorteile der FMM}
+%\frame{
+%\frametitle{Vorteile der FMM}
+%}
 
 
 \end{document}
