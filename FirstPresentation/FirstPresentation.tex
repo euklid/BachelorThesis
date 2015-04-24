@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[ngerman]{beamer}
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -14,12 +14,12 @@
 \setbeamercovered{transparent}
 \setbeamertemplate{footline}[frame number]
 \setbeamertemplate{caption}[numbered]
-%\setbeamertemplate{navigation symbols}{}%remove navigation symbols
+\setbeamertemplate{navigation symbols}{}%remove navigation symbols
 \newcommand{\grad}{^{\circ}}
 \title{Fast Multipole Method für Potentiale in 2D}
 \author{Robert Hemstedt}
 \institute[Universität Bonn -- Bonn]{
-\inst{}{Rheinische Friedrich Wilhelms-Universität Bonn -- Bonn, \newline \newline \tiny{betreut durch Prof. Dr. Schweitzer und Prof. Dr. Klein}}}
+\inst{}{Rheinische Friedrich Wilhelms-Universität Bonn -- Bonn, \newline \newline \tiny{betreut durch die Herren Prof. Dr. Schweitzer und Prof. Dr. Klein}}}
 
 \date[27.04.2014]{27. April 2014}
 
@@ -66,12 +66,12 @@ Also insgesamt $O(mn)$ Summationen für alle Potentiale. Insbesondere $O(m^2)$, 
 
 \section{Fast Multipole Method für Potentiale}
 \frame{
-\frametitle{Fast Multipole Method für Potentiale}
+\frametitle{$G$-Kernel}
 Die Funktion $\Phi_{x_i}(y_j)$ bezeichnet man in manchen Fällen auch als \emph{Kernel}. Bezeichne: 
 \begin{equation}\nonumber
 G(\mathbf{y},\mathbf{x}) := -\log(||\mathbf{x}-\mathbf{y}||)\text{ und }q(\mathbf{x}_i):=q_i\text{, also }\Phi_{\mathbf{x}_i}{\mathbf{y}_j}=K(\mathbf{y}_j,\mathbf{x}_i)q(\mathbf{x}_i)
 \end{equation}
-Ein Trick der FFM ist es, das Problem in die Komplexe Ebene zu legen. Identifiziere: 
+Ein Trick der FMM ist es, das Problem in die Komplexe Ebene zu legen. Identifiziere: 
 \begin{align*}
 \mathbf{x}=(\mathbf{x}_1,\mathbf{x}_2) \quad &\Rightarrow \quad z = \mathbf{x}_1 + i\mathbf{x}_2, \\
 \mathbf{y}=(\mathbf{y}_1,\mathbf{y}_2) \quad &\Rightarrow \quad z_0=\mathbf{y}_1 + i \mathbf{y}_2, \\
@@ -99,6 +99,7 @@ $G_i^x(\mathbf{y_c},\mathbf{x})$ ist \emph{unabhängig} von $\mathbf{y}$, kann a
 \end{frame}
 
 \begin{frame}{Expansion des $G$-Kernels}
+\normalsize
 \begin{alertblock}{Konvention}
 Ab sofort arbeiten wir nur noch in $\mathbb{C}$.
 \end{alertblock}
@@ -130,7 +131,7 @@ Es ist einer der Schlüsselpunkte der FMM, dass durch Gleichung \eqref{multiexp}
 
 \begin{frame}{Multipolexpansion}
 \small
-\begin{Satz}{Multipolexpansion}
+\begin{Satz}[Multipolexpansion]
 Es seien die Punkte $z_1,\ldots, z_m$ mit Ladungen $q(z_1),\ldots,q(z_m)$ gegeben. Weiterhin seien $z_0$ und $z_c$ derart, dass $|z_i-z_c| \ll |z_0-z_c|$ für alle $i=1,\ldots,m$. Dann gilt:
 \begin{equation}\nonumber
 \sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{i=1}^m \left[\sum_{k=0}^\infty O_k(z_0-z_c)I_k(z_i-z_c)\right] q(z_i);
@@ -155,17 +156,140 @@ Später werden die $z_c$ Zentren von Zellen eines Gitters sein, sodass die Momen
 \end{frame}
 \begin{frame}{Fehler der Multipolexpansion}
 In \eqref{multipolexp} tritt eine \emph{unendliche} Summe auf. Fehler in der Fast Multipole Method können durch die Anzahl der ausgewerteten Terme in \eqref{multipolexp} kontrolliert werden.
-
+\begin{Satz}[Fehler der Multipolexpansion]
+Für den Fehler $E_M^p$ der Multipolexpansion gilt:
+\begin{align*}
+E^p_M&:= \left|\sum_{i=1}^m {G(z_0,z_i)q(z_i)} - \sum_{k=0}^p O_k(z_0-z_c)M_k(z_c)\right| \\
+&\leq \frac{A}{1-\frac{R}{|z_0-z_c|}}\frac{R^{p+1}}{|z_0-z_c|^{p+1}}, 
+\end{align*}
+wobei $R$ der Radius eines Kreises um $z_c$ mit $|z_i-z_c| < R < |z_0-z_c|$ für alle $i=1,\ldots,n$ und $A=\sum_{i=1}^m |q_i|$.
+\end{Satz}
 \end{frame}
 
-\subsection{FFM-Algorithmus}
+\begin{frame}{Fehler der Multipolexpansion}
+\footnotesize
+\begin{Beweis}
+\begin{align*}
+E^p_M&:= \left|\sum_{k=p+1}^\infty O_k(z_0-z_c)M_k(z_c)\right| \leq \sum_{k=p+1}^\infty |O_k(z_0-z_c)||M_k(z_c)| \\
+&\leq \sum_{k=p+1}^\infty |O_k(z_0-z_c)| \left|\sum_{i=1}^m I_k(z_i-z_c) q(z_i)\right| \\
+&\leq \sum_{k=p+1}^\infty |O_k(z_0-z_c)| \sum_{i=1}^m |I_k(z_i-z_c)| |q(z_i)| \\
+&\leq A \sum_{k=p+1}^\infty |O_k(z_0-z_c)| \frac{R^k}{k!} \leq A \sum_{k=p+1}^\infty \frac{(k-1)!}{|z_0-z_c|^k} \frac{R^k}{k!} \\
+&\leq A \sum_{k=p+1}^\infty \frac{R^k}{|z_0-z_c|^k} = \frac{A}{1-\frac{R}{|z_0-z_c|}}\frac{R^{p+1}}{|z_0-z_c|^{p+1}}
+\end{align*}
+\end{Beweis}
+\end{frame}
+
+\begin{frame}{Fehler der Multipolexpansion}
+Sei $\rho = \frac{|z_0-z_c|}{R}$. Dann lässt sich $E^p_M$ abschätzen als 
+\begin{equation}\label{rhomultipolerror}
+E^p_M \leq \frac{A}{\rho-1}\left(\frac{1}{\rho}\right)^p
+\end{equation}
+\begin{block}{Bemerkung}
+Je größer $\rho$, desto kleiner ist die Fehlerschranke. Beobachte, dass für den Fall $\rho \geq 2 \Leftrightarrow |z_0-z_c| \geq 2 R$:
+\begin{equation}\label{halfmultipolerror}
+E^p_M \leq A\left(\frac{1}{2}\right)^p
+\end{equation}
+Damit kann man für eine vorher festgelegte Genauigkeit $\varepsilon$ die Anzahl $p$ der zu evaluierenden Momente bestimmen.
+\end{block}
+\end{frame}
+
+\begin{frame}{Translationsoperatoren}
+Während des Algorithmus werden mehrere Expansionspunkte benötigt. Anstatt alle Momente für einen neuen Expansionspunkt $z_c'$ wieder neu zu berechnen, kann man die alten Momente von $z_c$ \glqq verschieben\grqq.
+\begin{Satz}[Moment-to-Moment-Translation, M2M]
+Es seien die Punkte $z_1,\ldots, z_m$ mit Ladungen $q(z_1),\ldots,q(z_m)$ gegeben. Weiterhin seien $z_0$, $z_c$ und $z_c'$ derart, dass $|z_i-z_c| \ll |z_0-z_c|$ und $|z_i-z_c'| \ll |z_0-z_c'|$  und für alle $i=1,\ldots,m$. Dann gilt
+\begin{equation}\label{M2Meq}
+M_k(z_c') = \sum_{l=0}^k I_{k-l}(z_c-z_c')M_l(z_c).
+\end{equation}
+\end{Satz}
+\end{frame}
+
+\begin{frame}{Moment-to-Moment-Translation}
+\footnotesize
+\begin{Beweis}
+\begin{align*}
+M_k(z_c') &= \sum_{i=0}^m I_k(z-z_c')q(z_i) \\
+&=  \sum_{i=0}^m I_k\left[(z-z_c) + (z_c-z_c')\right]q(z_i) \\
+&= \sum_{i=0}^m \sum_{l=0}^k I_l(z-z_c)I_{k-l}(z_c-z_c') q(z_i)\\
+&= \sum_{l=0}^k I_{k-l}(z_c-z_c')M_l(z_c)
+\end{align*}
+Dabei haben wir die Binomische Formel in der dritten Gleichung verwendet.
+\end{Beweis}
+\begin{block}{Bemerkung}
+Durch die endliche Zahl der Summanden wird keine weitere Fehlerquelle eingeführt.
+\end{block}
+\end{frame}
+
+\begin{frame}{Lokale Expansion}
+Statt des Expansionspunkt $z_c$ verschieben wir jetzt den Quellpunkt $x_0$:
+\begin{Satz}[Lokale Expansion und Moment-to-Local-Translation]
+Mit den Bedingungen der Multipolexpansion sei ein weiterer Punkt $z_L$ nahe $z_0$, d.h. $|z_0-z_L|\ll |z_l-z_c|$ gegeben. Dann gilt die folgende \emph{lokale Expansion}
+\begin{equation}\label{localexp}
+\sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{l=0}^\infty L_l(z_L)I_l(z_0-z_L),
+\end{equation}
+wobei die lokalen Expansionskoeffizienten $L_l(z_L)$ durch die folgende \emph{Moment-to-Local-Expansion}(M2L) gegeben sind:
+\begin{equation}\label{M2L}
+L_l(z_L)=(-1)^l\sum_{k=0}^\infty O_{l+k}(z_L-z_c)M_k(z_c).
+\end{equation}
+\end{Satz}
+\end{frame}
+
+\begin{frame}{Lokale Expansion}
+\begin{block}{Vorschau}
+Sind die lokalen Expansionskoeffizienten $L_l(z_L)$ einmal berechnet worden, ist die Gleichung \eqref{localexp} 
+\[\sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{l=0}^\infty L_l(z_L)I_l(z_0-z_L)
+\]
+unabhängig von $z_c$. Wie bei der Moment-to-Moment-Translation lässt sich auch eine Local-to-Local-Expansion ausdrücken. Ein weiterer Fall, wo bereits berechnete Terme wiederverwendet werden können.
+
+Die $z_L$ werden auch wie die $z_c$ später im Algorithmus Gitterpunkte darstellen.
+\end{block}
+\end{frame}
+
+\begin{frame}{Fehler der Moment-to-Local-Translation}
+Auch in \eqref{M2L} tritt eine endliche Summe auf. Es gilt:
+\begin{Satz}[Fehler der M2L Translation]
+Für den Fehler $E_L^p$ der Moment-to-Local-Expansion gilt:
+\begin{align*}
+E^p_L&:= \left|\sum_{i=1}^m {G(z_0,z_i)q(z_i)} - \sum_{l=0}^p L_l(z_L)I_l(z_0-z_L)\right|\\
+&=\left|\sum_{l=p+1}^\infty L_l(z_L)I_l(z_0-z_L)\right| \leq \frac{A\left[4e(p+\rho)(\rho+1)+\rho^2\right]}{\rho(\rho-1)}\left(\frac{1}{\rho}\right)^{p+1},
+\end{align*}
+für alle $p\geq \max\{2, \frac{2\rho}{\rho-1}\}$, wobei $e$ die Eulersche Zahl ist und $A$ und $\rho$ wie bisher definiert sind.
+\end{Satz}
+\end{frame}
+
+\begin{frame}{Local-to-Local-Translation}
+\normalsize
+Ähnlich der Moment-to-Local-Translation führen wir die Local-to-Local-Translation ein:
+\begin{Satz}[Local-to-Local-Translation, L2L]
+Es sei $z_{L'}$ ein Punkt nahe $z_L$, d.h. $|z_0-z_{L'}|\ll |z_0-z_c|$. Dann gilt für eine lokale Expansion mit $p$ Termen:
+\begin{align}
+\sum_{i=1}^m {G(z_0,z_i)q(z_i)} &\approx \sum_{l=0}^p L_l(z_L)I_l(z_0-z_L) = \sum_{l=0}^p L_l(z_{L'})I_l(z_0-z_{L'}),\nonumber\\
+\text{wobei } L_l(z_{L'})&=\sum_{s=0}^{p-l} I_s(z_{L'}-z_L)L_{l+s}(z_L)\label{L2Leq}
+\end{align}
+\end{Satz}
+\begin{block}{Bemerkung}
+Wie bereits bei der M2M-Translation \eqref{M2Meq} werden bei der L2L-Translation \eqref{L2Leq} nur endliche viele Terme addiert, also keine weiteren Fehler eingeführt.
+\end{block}
+\end{frame}
+
+\begin{frame}{Local-to-Local-Translation}
+\begin{Beweis}
+\begin{align*}
+\sum_{l=0}^p L_l(z_L)I_l(z_0-z_L) &= \sum_{l=0}^p L_l(z_L)I_l\left[(z_0-z_{L'}) + (z_{L'}-z_L)\right]\\
+&=\sum_{0\leq s\leq l \leq p} I_s(z_0-z_{L'}) L_l(z_L)I_{l-s}(z_{L'}-z_L)\\
+&=\sum_{l=0}^p \sum_{s=l}^p I_l(z_0-z_{L'}) L_s(z_L)I_{s-l}(z_{L'}-z_L) \\
+&=\sum_{l=0}^p I_l(z_0-z_{L'}) \underbrace{\sum_{s=0}^{p-l}  L_{l+s}(z_L)I_{s}(z_{L'}-z_L)}_{=L_l(z_{L'})}
+\end{align*}
+\end{Beweis}
+\end{frame}
+
+\subsection{FMM-Algorithmus}
 \frame{
-\frametitle{FFM-Algorithmus}
+\frametitle{FMM-Algorithmus}
 }
 
-\section{Vorteile der FFM}
+\section{Vorteile der FMM}
 \frame{
-\frametitle{Vorteile der FFM}
+\frametitle{Vorteile der FMM}
 }
 
 
