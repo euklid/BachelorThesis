@@ -1,0 +1,113 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% (C) 2015, by Robert Hemstedt <CC-BY-SA 3.0>                                                        %
+% This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.        %
+% To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/.              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8x]{inputenc}
+%\usepackage{ucs}
+\usepackage[left=2.0cm, right=2.0cm, top=2.0cm, bottom=2.0cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage[ngerman]{babel}
+\usepackage{bbm}
+\usepackage{amssymb}
+\usepackage[amsthm,thmmarks]{ntheorem}
+%\usepackage{tabularx}
+\usepackage[arrow, matrix, curve]{xy}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
+% b) Lemma, Satz, Theorem usw.
+\makeatletter
+\renewtheoremstyle{plain}%
+  {\item[\hskip\labelsep \theorem@headerfont ##1\ ##2:]}%
+  {\item[\hskip\labelsep \theorem@headerfont ##1~##2~##3:]\mbox{}}
+\makeatother
+
+\theoremstyle{plain}
+\newtheorem{Theorem}{Theorem}[section]
+\newtheorem*{Satz}[Theorem]{Satz}
+\newtheorem{Prop}[Theorem]{Proposition}
+\newtheorem{Lemma}[Theorem]{Lemma}
+\newtheorem{Korollar}[Theorem]{Korollar}
+\newtheorem{Definition}[Theorem]{Definition}
+\newtheorem*{Folgerung}[Theorem]{Folgerung}
+\newtheorem*{Behauptung}[Theorem]{Behauptung}
+\newtheorem{bez}[Theorem]{Bezeichnung}
+
+\theorembodyfont{\upshape}
+\newtheorem{Bemerkung}[Theorem]{Bemerkung}
+\newtheorem{Beispiel}[Theorem]{Beispiel}
+
+\newcommand{\herv}[1]{{\emph{\textbf{#1}}}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Ch}{\hat{\C}}
+\newcommand{\cupdot}{\mathbin{\dot{\cup}}}
+
+\def\presuper#1#2%
+  {\mathop{}%
+   \mathopen{\vphantom{#2}}^{#1}%
+   \kern-\scriptspace%
+   #2}
+
+\numberwithin{equation}{section}
+
+\newsavebox{\fmbox}
+\newenvironment{fmpage}[1]
+{\begin{lrbox}{\fmbox}\begin{minipage}{#1}}
+{\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
+
+\linespread{1.05}
+\author{Robert Hemstedt \\ \texttt{r@twopi.eu}}
+\date{27. April 2015}
+\title{Begleitmaterial Seminarvortrag Fast Multipole Methode für Potentiale in 2D}
+
+\begin{document}
+\maketitle
+\textit{Dieses Werk unterliegt der Creative Commons Attribution-ShareAlike 3.0 Unported License.}\\
+Die Folien des Vortrags sowie dieses Begleitmaterial lassen sich in meinem \texttt{GitHub}-Repository \\ {\url{https://github.com/euklid/BachelorThesis/tree/master/FirstPresentation} finden.
+\section{Bezeichnungen}
+\begin{tabular}{ll}
+$x_1,\ldots,x_m,  z_1,\ldots,z_m$  & gegebene geladene Punkte, \\
+$y_1,\ldots,y_n$  & gegebene Punkte, an denen das Potential $\Phi(y_i)$ berechnet werden soll, \\
+$q_1,\ldots, q_m$  & Ladungen der Punkte $x_1,\ldots,x_m$, \\
+$q(z_i)$ & Ladung des Punktes $z_i$, \\
+$z_0$ & Quellpunkt, \\
+$z_c, z_{c'}$ & (Multipol-)Expansionspunkte, \\
+$z_L, z_{L'}$ & Lokale Expansionspunkte,\\
+$p$ & Anzahl Summanden in der Multipolexpansion
+\end{tabular}
+\section{Fast Multipole Method -- Formeln}
+\begin{itemize}
+\item Potential an $y_j$ durch Ladung $q_i$ an $x_i$: \[\Phi_{x_i}(y_j) = -q_i\log(||y_j-x_i||)\]
+\item Kernel: \[
+\text{reeller Kernel: } G(\mathbf{y},\mathbf{x}) := -\log(||\mathbf{x}-\mathbf{y}||), \qquad \text{komplexer Kernel: }G (z_0,z) = -\log(z_0-z) \]
+\item (1) Kernelexpansion: \begin{equation*}
+G(z_0,z) = \sum_{k=0}^\infty {O_k(z_0-z_c)I_k(z-z_c)},
+\end{equation*}
+Wobei 
+\begin{equation*}
+I_k(z)=\frac{z^k}{k!}, k\geq 0 \qquad \text{ sowie } \qquad O_k(z)=\frac{(k-1)!}{z^k}, k\geq 1; \text{ und } O_0(z)=-\log(z).
+\end{equation*}
+\item (2) Multipolexpansion:\[\sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{k=0}^\infty O_k(z_0-z_c)M_k(z_c) \approx \sum_{k=0}^p O_k(z_0-z_c)M_k(z_c)\]
+\item (3) Momente:\[M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i)\]
+\item (4) M2M-Translation:  \[ M_k(z_c') = \sum_{l=0}^k I_{k-l}(z_c-z_c')M_l(z_c) \]
+\item (5) Lokale Expansion: \[ \sum_{i=1}^m {G(z_0,z_i)q(z_i)} \approx \sum_{l=0}^p L_l(z_L)I_l(z_0-z_L)\]
+\item (6) M2L-Translation: \[ L_l(z_L)\approx(-1)^l\sum_{k=0}^p O_{l+k}(z_L-z_c)M_k(z_c)\]
+\item (7) L2L-Translation:\[L_l(z_{L'})=\sum_{s=0}^{p-l} I_s(z_{L'}-z_L)L_{l+s}(z_L)\]
+\end{itemize}
+
+\appendix
+\section{Quellen}
+\nocite{*}
+\bibliographystyle{plain}
+\bibliography{sources}
+
+\end{document}
