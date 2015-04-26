@@ -25,7 +25,7 @@
 \title{Fast Multipole Method für Potentiale in 2D}
 \author{Robert Hemstedt}
 \institute[Universität Bonn -- Bonn]{
-\inst{}{Rheinische Friedrich Wilhelms-Universität Bonn -- Bonn, \newline \newline \tiny{betreut durch die Herren Prof. Dr. Schweitzer und Prof. Dr. Klein}}}
+\inst{}{Rheinische Friedrich Wilhelms-Universität Bonn -- Bonn \newline \newline \tiny{betreut durch die Herren Prof. Dr. Schweitzer und Prof. Dr. Klein}}}
 \date[27.04.2014]{27. April 2014}
 
 \begin{document}
@@ -343,6 +343,7 @@ Berechnung aller Momente aller Zellenzentren von Level $\geq 2$ mit $p$ Termen, 
 \includegraphics[width=0.5\textwidth]{upward.png}
 \caption{Beispielhafter Upward pass von einer Blattzelle. \linebreak violett: Zentren von Vaterzellen, gelb: Zentren von Blättern,\linebreak $\rightarrow$: Moment direkt berechnet, $\dashrightarrow$: M2M-Translation}
 \end{figure}
+\framezoom<1><2>[border](4cm,1.5cm)(2cm,2cm)
 \end{frame}
 
 \begin{frame}{Downward pass}
@@ -352,7 +353,7 @@ Hierfür benötigen wir noch etwas mehr Vokabular:
 \item Zwei Zellen heißen \emph{benachbart in Level $l$}, wenn sie mindestens eine gemeinsame Ecke haben. Zwei Blattzellen verschiedener Level sind dann benachbart, falls die Vaterzelle einer Zelle mit der anderen Zelle mindestens eine Ecke gemeinsam hat.
 \item Zwei Zellen heißen \emph{gut separiert in Level $l$}, wenn sie auf Level $l$ \emph{nicht benachbart sind}, aber ihre \emph{Vaterzellen in Level $l-1$ benachbart} sind.
 \item Bezeichne die Menge aller gut separierten Zellen einer Zelle $C$ in Level $l$ als \emph{Interaktionsliste} von $C$.
-\item Eine Zelle ist eine \emph{Fernzelle} von $C$, wenn ihre jeweiligen Vaterzellen nicht benachbart sind. Dabei sind die größtmöglichen Vaterzellen die von Level $2$.
+\item Eine Zelle ist eine \emph{Fernzelle} von $C$, wenn ihre jeweiligen Vaterzellen nicht benachbart sind.
 \end{itemize}
 \end{Definition}
 \end{frame}
@@ -390,6 +391,7 @@ Berechnung aller lokalen Expansionskoeffizienten aller Zellen startend bei Level
 \includegraphics[height=0.5\textwidth]{downpass2.png}
 \caption{Downward Pass bei Leveln 3 und 4. $\dashrightarrow$: M2L-Translation, $\rightarrow$: L2L-Translation, Kreis: Zellzentrum Level 2, Quadrat: Zellzentrum Level 3, Dreieck: Zellzentrum Level 4}
 \end{figure}
+\framezoom<1><2>[border](3.5cm,3.5cm)(5cm,3cm)
 \end{frame}
 
 \begin{frame}{Berechnung der Potentiale}
