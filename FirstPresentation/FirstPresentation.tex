@@ -72,7 +72,7 @@ Also insgesamt $O(mn)$ Summationen für alle Potentiale. Insbesondere $O(m^2)$, 
 \section{Fast Multipole Method für Potentiale}
 \frame{
 \frametitle{$G$-Kernel}
-Die Funktion $\Phi_{x_i}(y_j)$ bezeichnet man in manchen Fällen auch als \emph{Kernel}\cite{FMBEM}. Bezeichne: 
+Bezeichne: 
 \begin{equation}\nonumber
 G(\mathbf{y},\mathbf{x}) := -\log(||\mathbf{x}-\mathbf{y}||)\text{ und }q(\mathbf{x}_i):=q_i\text{, also }\Phi_{\mathbf{x}_i}(\mathbf{y}_j)=G(\mathbf{y}_j,\mathbf{x}_i)q(\mathbf{x}_i)
 \end{equation}
@@ -349,7 +349,7 @@ Berechnung aller Momente aller Zellenzentren von Level $\geq 2$ mit $p$ Termen, 
 Hierfür benötigen wir noch etwas mehr Vokabular:
 \begin{Definition}
 \begin{itemize}
-\item Zwei Zellen heißen \emph{benachbart in Level $l$}, wenn sie mindestens eine gemeinsame Ecke haben.
+\item Zwei Zellen heißen \emph{benachbart in Level $l$}, wenn sie mindestens eine gemeinsame Ecke haben. Zwei Blattzellen verschiedener Level sind dann benachbart, falls die Vaterzelle einer Zelle mit der anderen Zelle mindestens eine Ecke gemeinsam hat.
 \item Zwei Zellen heißen \emph{gut separiert in Level $l$}, wenn sie auf Level $l$ \emph{nicht benachbart sind}, aber ihre \emph{Vaterzellen in Level $l-1$ benachbart} sind.
 \item Bezeichne die Menge aller gut separierten Zellen einer Zelle $C$ in Level $l$ als \emph{Interaktionsliste} von $C$.
 \item Eine Zelle ist eine \emph{Fernzelle} von $C$, wenn ihre jeweiligen Vaterzellen nicht benachbart sind. Dabei sind die größtmöglichen Vaterzellen die von Level $2$.
