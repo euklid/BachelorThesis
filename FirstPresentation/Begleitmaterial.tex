@@ -99,10 +99,17 @@ I_k(z)=\frac{z^k}{k!}, k\geq 0 \qquad \text{ sowie } \qquad O_k(z)=\frac{(k-1)!}
 \item (2) Multipolexpansion:\[\sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{k=0}^\infty O_k(z_0-z_c)M_k(z_c) \approx \sum_{k=0}^p O_k(z_0-z_c)M_k(z_c)\]
 \item (3) Momente:\[M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i)\]
 \item (4) M2M-Translation:  \[ M_k(z_c') = \sum_{l=0}^k I_{k-l}(z_c-z_c')M_l(z_c) \]
-\item (5) Lokale Expansion: \[ \sum_{i=1}^m {G(z_0,z_i)q(z_i)} \approx \sum_{l=0}^p L_l(z_L)I_l(z_0-z_L)\]
-\item (6) M2L-Translation: \[ L_l(z_L)\approx(-1)^l\sum_{k=0}^p O_{l+k}(z_L-z_c)M_k(z_c)\]
+\item (5) Lokale Expansion: \[ \sum_{i=1}^m {G(z_0,z_i)q(z_i)} = \sum_{l=0}^\infty L_l(z_L)I_l(z_0-z_L)\approx \sum_{l=0}^p L_l(z_L)I_l(z_0-z_L)\]
+\item (6) M2L-Translation: \[ L_l(z_L)=\sum_{k=0}^\infty O_{l+k}(z_L-z_c)M_k(z_c)\approx(-1)^l\sum_{k=0}^p O_{l+k}(z_L-z_c)M_k(z_c)\]
 \item (7) L2L-Translation:\[L_l(z_{L'})=\sum_{s=0}^{p-l} I_s(z_{L'}-z_L)L_{l+s}(z_L)\]
 \end{itemize}
+\begin{figure}
+\centering
+\def\svgwidth{0.5\textwidth}
+\input{moments.pdf_tex}
+\caption{Lagesituation für Multipolexpansion}
+\end{figure}
+
 
 \appendix
 \section{Quellen}

@@ -152,6 +152,14 @@ M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i).
 \end{Satz}
 \end{frame}
 
+\begin{frame}{Multipolexpansion}
+\begin{figure}
+\def\svgwidth{0.5\textwidth}
+\input{moments.pdf_tex}
+\caption{Lagesituation für Multipolexpansion}
+\end{figure}
+\end{frame}
+
 \begin{frame}{Momente}
 \begin{block}{Der Überlegung wert}
 Die Momente \[ M_k(z_c) =  \sum_{i=1}^m I_k(z_i-z_c) q(z_i) \] sind nur von den gegebenen Ladungspunkten $z_1,\ldots,z_m$ und dem Expansionspunkt $z_c$ abhängig und brauchen nicht nochmal berechnet werden, wenn $z_0$ seine Lage ändert!
@@ -265,7 +273,7 @@ für alle $p\geq \max\{2, \frac{2\rho}{\rho-1}\}$, wobei $e$ die Eulersche Zahl 
 \normalsize
 Ähnlich der Moment-to-Moment-Translation führen wir die Local-to-Local-Translation ein:
 \begin{Satz}[Local-to-Local-Translation, L2L]
-Es sei $z_{L'}$ ein Punkt nahe $z_L$, d.h. $|z_0-z_{L'}|\ll |z_0-z_c|$. Dann gilt für eine lokale Expansion mit $p$ Termen:
+Es sei $z_{L'}$ ein Punkt nahe $z_L$. Dann gilt für eine lokale Expansion mit $p$ Termen:
 \begin{align}
 \sum_{i=1}^m {G(z_0,z_i)q(z_i)} &\approx \sum_{l=0}^p L_l(z_L)I_l(z_0-z_L) = \sum_{l=0}^p L_l(z_{L'})I_l(z_0-z_{L'}),\nonumber\\
 \text{wobei } L_l(z_{L'})&=\sum_{s=0}^{p-l} I_s(z_{L'}-z_L)L_{l+s}(z_L)\label{L2Leq}
